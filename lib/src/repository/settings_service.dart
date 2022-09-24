@@ -16,7 +16,6 @@ class SettingsService {
     var res = await get(Uri.parse(
         '${GlobalConfiguration().getValue('api_base_url')}/api/settings/settings.php'));
 
-    print("res.statusCode");
     print(res.statusCode);
     if (res.statusCode == 200) {
       final json = jsonDecode(res.body);
