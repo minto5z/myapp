@@ -39,7 +39,7 @@ jobs:
       - run: flutter upgrade
       - run: flutter pub get
       - run: flutter pub run flutter_app_name
-      - run: flutter test
+      #- run: flutter test
       - run: flutter build apk --debug --split-per-abi
       - run: |
           flutter build ios --no-codesign
