@@ -53,14 +53,14 @@ dependencies:
   connectivity_plus: ^2.3.7
   # TOOLS
   google_fonts: ^3.0.1
-  package_info_plus: ^1.4.3+1
+#  package_info_plus: ^1.4.3+1
   global_configuration: ^2.0.0-nullsafety.1
   flutter_downloader: 1.8.4
   flutter_barcode_scanner: ^2.0.0
   flutter_speed_dial: ^3.0.5
   flutter_inappwebview: ^5.4.3+7
   permission_handler: ^9.2.0
-  device_info_plus: ^4.1.2
+#  device_info_plus: ^4.1.2
   launch_review: ^3.0.1
   uni_links: ^0.5.1
   restart_app: ^1.1.0+1
@@ -80,7 +80,9 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
-
+  flutter_app_name: ^0.1.0
+flutter_app_name:
+  name: "My App"
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
