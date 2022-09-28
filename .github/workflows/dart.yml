@@ -33,10 +33,10 @@ jobs:
       # want to change this to 'flutter test'.
       #- name: Run tests
       #  run: dart test
-      - uses: subosito/flutter-action@v2
+      - uses: subosito/flutter-action@v1
         with:
           flutter-version: '2.2.0'
-      #- run: flutter upgrade
+      - run: flutter upgrade
       - run: flutter pub get
       - run: flutter pub run flutter_app_name
       #- run: flutter test
