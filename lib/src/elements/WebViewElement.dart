@@ -10,9 +10,6 @@ class WebViewElement extends StatefulWidget {
   String? loader;
   String? loaderColor;
   String? pullRefresh = "true";
-  String? customCss;
-  String? customJavascript;
-  Settings settings;
   void Function()? onLoadEnd = () => {};
 
   WebViewElement(
@@ -21,9 +18,6 @@ class WebViewElement extends StatefulWidget {
       this.loader,
       this.loaderColor,
       this.pullRefresh,
-      this.customCss,
-      this.customJavascript,
-      required this.settings,
       this.onLoadEnd})
       : super(key: key);
 

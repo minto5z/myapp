@@ -2,7 +2,7 @@ import 'package:myapp/src/models/setting.dart';
 import 'package:myapp/src/models/splash.dart';
 
 class Settings {
-  List<Setting>? setting = [];
+  List<dynamic>? setting = [];
   Splash? splash;
   Map<String, Map<String, String>> translation = {};
 

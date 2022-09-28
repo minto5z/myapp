@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:global_configuration/global_configuration.dart';
 import 'package:provider/provider.dart';
 
 import '../helpers/HexColor.dart';
@@ -7,10 +8,9 @@ import '../models/settings.dart';
 import '../services/theme_manager.dart';
 
 class AppBarItem extends StatefulWidget implements PreferredSizeWidget {
-  Settings settings;
   String title;
 
-  AppBarItem({Key? key, required this.settings, this.title = ""})
+  AppBarItem({Key? key, this.title = ""})
       : super(key: key);
 
   @override
@@ -40,12 +40,10 @@ class _AppBarItem extends State<AppBarItem> {
               end: Alignment.centerRight,
               colors: <Color>[
                 themeProvider.isLightTheme
-                    ? HexColor(Setting.getValue(
-                        widget.settings.setting!, "firstColor"))
+                    ? HexColor(GlobalConfiguration().getValue("firstColor"))
                     : themeProvider.darkTheme.primaryColor,
                 themeProvider.isLightTheme
-                    ? HexColor(Setting.getValue(
-                        widget.settings.setting!, "secondColor"))
+                    ? HexColor(GlobalConfiguration().getValue("secondColor"))
                     : themeProvider.darkTheme.primaryColor,
               ],
             ),

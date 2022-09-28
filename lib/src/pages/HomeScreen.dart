@@ -5,6 +5,7 @@ import 'package:myapp/src/elements/WebViewElement.dart';
 
 import '../elements/WebViewElementState.dart';
 import '../helpers/HexColor.dart';
+import '../helpers/SharedPref.dart';
 import '../models/setting.dart';
 import '../models/settings.dart';
 
@@ -32,9 +33,8 @@ List<StreamController<int>> listStream = [
 
 class HomeScreen extends StatefulWidget {
   final String url;
-  final Settings settings;
 
-  const HomeScreen(this.url, this.settings, {super.key});
+  const HomeScreen(this.url, {super.key});
 
   @override
   State<StatefulWidget> createState() {
@@ -50,17 +50,25 @@ class _HomeScreen extends State<HomeScreen> with TickerProviderStateMixin {
   bool goToWeb = true;
   var appLanguage;
   String url = "";
+  late String loader = "";
+  late String loaderColor="";
+  late String pullRefresh="";
 
+  SharedPref sharedPref = SharedPref();
   @override
   void initState() {
     super.initState();
     tabController = TabController(initialIndex: 0, length: 1, vsync: this);
     tabController.addListener(_handleTabSelection);
-
     _handleIncomingLinks();
   }
 
-  void _handleIncomingLinks() {}
+  Future<void> _handleIncomingLinks() async {
+    url = await sharedPref.read("api_base_url");
+    loader = await sharedPref.read("loader");
+    loaderColor = await sharedPref.read("loaderColor");
+    pullRefresh = await sharedPref.read("pull_refresh");
+  }
 
   _handleTabSelection() {
     setState(() {
@@ -72,7 +80,6 @@ class _HomeScreen extends State<HomeScreen> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     MediaQueryData mediaQueryData = MediaQuery.of(context);
     var bottomPadding = mediaQueryData.padding.bottom;
-
     return WillPopScope(
         onWillPop: () async {
           getCurrentKey().currentState!.goBack();
@@ -95,32 +102,20 @@ class _HomeScreen extends State<HomeScreen> with TickerProviderStateMixin {
               //     : null,
               body: Stack(fit: StackFit.expand, children: [
                 Column(children: [
-                  // if (Setting.getValue(
-                  //         widget.settings.setting!, "tab_position") ==
-                  //     "top")
-                    // TabNavigationMenu(
-                    //     settings: widget.settings,
-                    //     listStream: listStream,
-                    //     tabController: tabController,
-                    //     currentIndex: _currentIndex),
-
-                    //Text(Setting.getValue(widget.settings.setting!, "tab_position")),
                     Expanded(
                       child: WebViewElement(
                           key: listKey[0],
-                          initialUrl: 'http://63.142.251.34:8100',
+                          initialUrl: url,
                           //renderLang("url", languageCode),
-                          loader: Setting.getValue(
-                              widget.settings.setting!, "loader"),
-                          loaderColor: Setting.getValue(
-                              widget.settings.setting!, "loaderColor"),
-                          pullRefresh: Setting.getValue(
-                              widget.settings.setting!, "pull_refresh"),
-                          customCss: Setting.getValue(
-                              widget.settings.setting!, "customCss"),
-                          customJavascript: Setting.getValue(
-                              widget.settings.setting!, "customJavascript"),
-                          settings: widget.settings),
+                          loader: loader,
+                          loaderColor: loaderColor,
+                          pullRefresh: pullRefresh,
+                      ),
+                          // customCss: Setting.getValue(
+                          //     widget.settings.setting!, "customCss"),
+                          // customJavascript: Setting.getValue(
+                          //     widget.settings.setting!, "customJavascript"),
+                          // settings: widget.settings),
                       // child: Setting.getValue(widget.settings.setting!,
                       //             "tab_navigation_enable") ==
                       //         "true"
@@ -249,15 +244,6 @@ class _HomeScreen extends State<HomeScreen> with TickerProviderStateMixin {
           return key0;
         }
     }
-  }
-
-  String renderLang(type, languageCode) {
-    if (widget.settings.translation[languageCode] != null) {
-      if (widget.settings.translation[languageCode] != null) {
-        return widget.settings.translation[languageCode]![type]!;
-      }
-    }
-    return " ";
   }
 }
 

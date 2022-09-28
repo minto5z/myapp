@@ -20,8 +20,6 @@ Future<void> main() async {
 
   await GlobalConfiguration().loadFromAsset("configuration");
 
-  await GlobalConfiguration().loadFromAsset("configuration");
-
   SharedPref sharedPref = SharedPref();
   Settings? settings;
   Uint8List? imgSplashBase64;
@@ -91,12 +89,10 @@ class MyApp extends StatelessWidget {
         initialData: ConnectivityStatus.Wifi,
         create: (context) =>
             ConnectivityService().connectionStatusController.stream,
-        child: Consumer<ThemeNotifier>(
-            builder: (context, theme, _) => MaterialApp(
-                  theme: theme.getTheme(),
-                  debugShowCheckedModeBanner: false,
-                  home: renderHome(),
-                )));
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          home: renderHome(),
+        ));
   }
 
   Widget renderHome() {
@@ -104,7 +100,6 @@ class MyApp extends StatelessWidget {
       return const InitialScreen();
     } else {
       return SplashScreen(
-          settings: settings!,
           bytesImgSplashBase64: imgSplashBase64!,
           byteslogoSplashBase64: logoSplashBase64!);
     }
@@ -121,14 +116,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -136,24 +123,8 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
-        ),
+        child: Column(),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }

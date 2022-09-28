@@ -5,13 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart';
 import 'package:myapp/src/repository/settings_service.dart';
-import 'package:provider/provider.dart';
 
 import '../elements/Loader.dart';
 import '../helpers/HexColor.dart';
-import '../models/setting.dart';
-import '../models/settings.dart';
-import '../services/theme_manager.dart';
+import '../helpers/SharedPref.dart';
 import '../themes/UIImages.dart';
 import 'SplashScreen.dart';
 
@@ -24,7 +21,7 @@ class InitialScreen extends StatefulWidget {
 
 class _InitialScreen extends State<InitialScreen> {
   final SettingsService settingsService = SettingsService();
-
+  SharedPref sharedPref = SharedPref();
   bool applicationProblem = false;
 
   Uint8List? bytesImgSplashBase64;
@@ -45,32 +42,30 @@ class _InitialScreen extends State<InitialScreen> {
   }
 
   Future<void> getSetting() async {
-    try {
-      Settings _settings = await settingsService.getSettings();
+    SharedPref sharedPref = SharedPref();
+    var logoSplashUrl = GlobalConfiguration().getValue('logo_splash_url');
+    var imgSplashUrl = GlobalConfiguration().getValue('img_splash_url');
+    var apiBaseUrl = GlobalConfiguration().getValue('api_base_url');
+    var loader = GlobalConfiguration().getValue('loader');
+    var loaderColor = GlobalConfiguration().getValue('loaderColor');
+    var pullRefresh = GlobalConfiguration().getValue('pull_refresh');
 
-      var themeProvider = Provider.of<ThemeNotifier>(context, listen: false);
-      themeProvider
-          .setFont(Setting.getValue(_settings.setting!, "google_font"));
+    sharedPref.save("logo_splash_url", logoSplashUrl);
+    sharedPref.save("img_splash_url", imgSplashUrl);
+    sharedPref.save("api_base_url", apiBaseUrl);
+    sharedPref.save("loader", loader);
+    sharedPref.save("loaderColor", loaderColor);
+    sharedPref.save("pull_refresh", pullRefresh);
+    Uint8List imgSplashBase64 = await networkImageToBase64(imgSplashUrl!);
 
-      Uint8List imgSplashBase64 =
-          await networkImageToBase64(_settings.splash!.img_splash_url!);
+    Uint8List logoSplashBase64 = await networkImageToBase64(logoSplashUrl!);
 
-      Uint8List logoSplashBase64 =
-          await networkImageToBase64(_settings.splash!.logo_splash_url!);
-
-      Navigator.of(context).pushReplacement(MaterialPageRoute(
-          builder: (BuildContext context) => SplashScreen(
-              settings: _settings,
-              bytesImgSplashBase64: imgSplashBase64,
-              byteslogoSplashBase64: logoSplashBase64)));
-    } on Exception catch (exception) {
-      setState(() {
-        applicationProblem = true;
-      });
-    } catch (Excepetion) {
-      setState(() {
-        applicationProblem = true;
-      });
+    Navigator.of(context).pushReplacement(MaterialPageRoute(
+        builder: (BuildContext context) => SplashScreen(
+            bytesImgSplashBase64: imgSplashBase64,
+            byteslogoSplashBase64: logoSplashBase64)));
+    if (sharedPref == null) {
+      applicationProblem = true;
     }
   }
 

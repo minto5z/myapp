@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:global_configuration/global_configuration.dart';
 import 'package:provider/provider.dart';
 import '../elements/AppBarItem.dart';
 import '../elements/WebViewElement.dart';
@@ -11,9 +12,8 @@ import '../services/theme_manager.dart';
 
 class WebScreen extends StatefulWidget {
   final String url;
-  final Settings settings;
 
-  const WebScreen(this.url, this.settings, {super.key});
+  const WebScreen(this.url, {super.key});
 
   @override
   State<StatefulWidget> createState() {
@@ -50,7 +50,7 @@ class _WebScreen extends State<WebScreen> {
         padding: EdgeInsets.only(bottom: bottomPadding),
         child: Scaffold(
             key: _scaffoldKey,
-            appBar: AppBarItem(settings: widget.settings, title: title!),
+            appBar: AppBarItem(title: title!),
             body: Stack(
               fit: StackFit.expand,
               children: [
@@ -59,19 +59,16 @@ class _WebScreen extends State<WebScreen> {
                       child: WebViewElement(
                           key: keyWebView,
                           initialUrl: widget.url,
-                          loader: Setting.getValue(
-                              widget.settings.setting!, "loader"),
-                          loaderColor: Setting.getValue(
-                              widget.settings.setting!, "loaderColor"),
-                          pullRefresh: Setting.getValue(
-                              widget.settings.setting!, "pull_refresh"),
+                          loader: GlobalConfiguration().getValue("loader"),
+                          loaderColor: GlobalConfiguration().getValue("loaderColor"),
+                          pullRefresh: GlobalConfiguration().getValue("pull_refresh"),
                           //userAgent: widget.settings.userAgent,
-                          customCss: Setting.getValue(
-                              widget.settings.setting!, "customCss"),
-                          customJavascript: Setting.getValue(
-                              widget.settings.setting!, "customJavascript"),
-                          // nativeApplication: widget.settings.nativeApplication,
-                          settings: widget.settings,
+                          // customCss: Setting.getValue(
+                          //     widget.settings.setting!, "customCss"),
+                          // customJavascript: Setting.getValue(
+                          //     widget.settings.setting!, "customJavascript"),
+                          // // nativeApplication: widget.settings.nativeApplication,
+                          // settings: widget.settings,
                           onLoadEnd: () => {
                                 keyWebView.currentState!.webViewController!
                                     .getTitle()

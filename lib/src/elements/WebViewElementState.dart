@@ -155,7 +155,7 @@ class WebViewElementState extends State<WebViewElement>
 
     var connectionStatus = Provider.of<ConnectivityStatus>(context);
     if (connectionStatus == ConnectivityStatus.Offline) {
-      return OfflineScreen(settings: widget.settings);
+      return const OfflineScreen();
     }
 
     return Stack(
@@ -200,9 +200,9 @@ class WebViewElementState extends State<WebViewElement>
                       _geolocationAlertFix();
                     });
 
-                    webViewController!.injectCSSCode(source: widget.customCss!);
-                    webViewController!
-                        .evaluateJavascript(source: widget.customJavascript!);
+                    // webViewController!.injectCSSCode(source: widget.customCss!);
+                    // webViewController!
+                    //     .evaluateJavascript(source: widget.customJavascript!);
 
                     setState(() {
                       this.url = url.toString();

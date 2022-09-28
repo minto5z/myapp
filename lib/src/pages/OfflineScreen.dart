@@ -8,9 +8,8 @@ import '../services/theme_manager.dart';
 import '../themes/UIImages.dart';
 
 class OfflineScreen extends StatefulWidget {
-  final Settings settings;
 
-  const OfflineScreen({super.key, required this.settings});
+  const OfflineScreen({super.key});
 
   @override
   State<StatefulWidget> createState() {
