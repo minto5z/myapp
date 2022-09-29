@@ -1,5 +1,5 @@
 {
-  "api_base_url": "http://63.142.251.34:8100",
+  "api_base_url": "http://63.142.251.34:8100/",
   "firstColor": "#181A1E",
   "secondColor": "#181A1E",
   "defaultLanguage": "en",
