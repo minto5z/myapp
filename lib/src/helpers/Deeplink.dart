@@ -8,10 +8,10 @@ abstract class Deeplink {
 
 class DeepLinkBloc extends Deeplink {
   //Event Channel creation
-  static const stream = EventChannel('positifmobile.com');
+  static const stream = EventChannel('com');
 
   //Method channel creation
-  static const platform = MethodChannel('positifmobile.com');
+  static const platform = MethodChannel('com');
 
   final StreamController<String> _stateController = StreamController();
 

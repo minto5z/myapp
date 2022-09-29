@@ -7,17 +7,8 @@ class Config {
   /* Default Logo Application*/
   static Image logo =
       Image.asset("$imageDir/logo.png", height: 150, width: 150);
-
-  static List language = [
-    {"value": "en", "name": "English", "subtitle": "English"},
-    {"value": "ar", "name": "Arabic", "subtitle": "العربية"},
-    {"value": "es", "name": "Spanish", "subtitle": "Español"},
-    {"value": "fr", "name": "French", "subtitle": "Français"},
-    {"value": "pt", "name": "Portuguese", "subtitle": "Português"},
-    {"value": "hi", "name": "Hindi", "subtitle": "हिन्दी"},
-    {"value": "de", "name": "German", "subtitle": "Deutsche"},
-    {"value": "it", "name": "Italian", "subtitle": "Italiano"},
-    {"value": "tr", "name": "Turkish", "subtitle": "Turc"},
-    {"value": "ru", "name": "Russian", "subtitle": "русский язык"}
-  ];
+  static Image splash = Image.asset("$imageDir/splash.png");
+  static Image wifi = Image.asset("$imageDir/wifi.png");
+  static Image no = Image.asset("$imageDir/no.png",
+      height: 50, width: 50, color: Colors.white);
 }

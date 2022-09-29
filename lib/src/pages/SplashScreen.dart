@@ -1,29 +1,19 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart';
 import 'package:myapp/src/data/config.dart';
-import 'package:myapp/src/models/setting.dart';
 import 'package:myapp/src/pages/HomeScreen.dart';
-import 'package:provider/provider.dart';
 
 import '../helpers/HexColor.dart';
-import '../helpers/SharedPref.dart';
-import '../models/settings.dart';
-import '../repository/settings_service.dart';
-import '../services/theme_manager.dart';
 
 class SplashScreen extends StatefulWidget {
-  final Uint8List bytesImgSplashBase64;
-  final Uint8List byteslogoSplashBase64;
+  // final Uint8List bytesImgSplashBase64;
+  // final Uint8List byteslogoSplashBase64;
 
-  const SplashScreen(
-      {super.key,
-      required this.bytesImgSplashBase64,
-      required this.byteslogoSplashBase64});
+  const SplashScreen({super.key});
 
   @override
   State<StatefulWidget> createState() {
@@ -33,9 +23,6 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreen extends State<SplashScreen> {
-  final SettingsService settingsService = SettingsService();
-  SharedPref sharedPref = SharedPref();
-  String url = "";
   bool applicationProblem = false;
 
   _SplashScreen();
@@ -55,13 +42,8 @@ class _SplashScreen extends State<SplashScreen> {
 
   Future<void> initSetting() async {
     try {
-      // var themeProvider = Provider.of<ThemeNotifier>(context, listen: false);
-      // themeProvider
-      //     .setFont(Setting.getValue(_settings.setting!, "google_font"));
-
       _mockCheckForSession().then((status) {
-        var future =
-            Future.delayed(const Duration(milliseconds: 150), _navigateToHome);
+        Future.delayed(const Duration(milliseconds: 150), _navigateToHome);
       });
     } on Exception catch (exception) {
       setState(() {
@@ -86,16 +68,12 @@ class _SplashScreen extends State<SplashScreen> {
   }
 
   Future<void> _navigateToHome() async {
-    url = await sharedPref.read("api_base_url");
     Navigator.of(context).pushReplacement(MaterialPageRoute(
-        builder: (BuildContext context) => HomeScreen(url)));
+        builder: (BuildContext context) => const HomeScreen()));
   }
 
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
-
     Color firstColor =
         HexColor('${GlobalConfiguration().getValue('firstColor')}');
 
@@ -123,18 +101,19 @@ class _SplashScreen extends State<SplashScreen> {
           Positioned(
               top: 0,
               right: 0,
-              child: Image.memory(
-                widget.bytesImgSplashBase64,
-                fit: BoxFit.cover,
-                height: height,
-                width: width,
-                alignment: Alignment.center,
-              )),
-          Align(
-            alignment: Alignment.center,
-            child: Image.memory(widget.byteslogoSplashBase64,
-                height: 150, width: 150),
-          ),
+              // child: Image.memory(
+              //   widget.bytesImgSplashBase64,
+              //   fit: BoxFit.cover,
+              //   height: height,
+              //   width: width,
+              //   alignment: Alignment.center,
+              // )
+              child: Config.splash),
+          // Align(
+          //   alignment: Alignment.center,
+          //   child: Image.memory(widget.byteslogoSplashBase64,
+          //       height: 150, width: 150),
+          // ),
           Align(alignment: Alignment.center, child: Config.logo),
           (applicationProblem == true)
               ? Positioned(

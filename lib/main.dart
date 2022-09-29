@@ -5,9 +5,6 @@ import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart';
 import 'package:myapp/src/enum/connectivity_status.dart';
 import 'package:myapp/src/helpers/ConnectivityService.dart';
-import 'package:myapp/src/helpers/SharedPref.dart';
-import 'package:myapp/src/models/settings.dart';
-import 'package:myapp/src/pages/InitialScreen.dart';
 import 'package:myapp/src/pages/SplashScreen.dart';
 import 'package:provider/provider.dart';
 
@@ -20,41 +17,21 @@ Future<void> main() async {
 
   await GlobalConfiguration().loadFromAsset("configuration");
 
-  SharedPref sharedPref = SharedPref();
-  Settings? settings;
-  Uint8List? imgSplashBase64;
-  Uint8List? logoSplashBase64;
+  // Uint8List? imgSplashBase64;
+  // Uint8List? logoSplashBase64;
 
   // To turn off landscape mode
   await SystemChrome.setPreferredOrientations(
     [DeviceOrientation.portraitUp],
   );
-
-  try {
-    var set = await sharedPref.read("settings");
-    if (set != null) {
-      settings = Settings.fromJson(set);
-
-      imgSplashBase64 =
-          await networkImageToBase64(settings.splash!.img_splash_url!);
-
-      logoSplashBase64 =
-          await networkImageToBase64(settings.splash!.logo_splash_url!);
-
-      if (imgSplashBase64 == null || logoSplashBase64 == null) {
-        settings = null;
-      }
-    }
-  } catch (exception) {
-    print(exception);
-  }
+  // imgSplashBase64 =
+  //     await networkImageToBase64(GlobalConfiguration().getValue('img_splash_url'));
+  //
+  // logoSplashBase64 =
+  //     await networkImageToBase64(GlobalConfiguration().getValue('logo_splash_url'));
 
   runApp(ChangeNotifierProvider<ThemeNotifier>(
-      create: (_) => ThemeNotifier(),
-      child: MyApp(
-          settings: settings,
-          imgSplashBase64: imgSplashBase64,
-          logoSplashBase64: logoSplashBase64)));
+      create: (_) => ThemeNotifier(), child: const MyApp()));
 }
 
 Future<Uint8List?> networkImageToBase64(String imageUrl) async {
@@ -72,15 +49,7 @@ Future<Uint8List?> networkImageToBase64(String imageUrl) async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp(
-      {Key? key,
-      required this.settings,
-      required this.imgSplashBase64,
-      required this.logoSplashBase64})
-      : super(key: key);
-  final Settings? settings;
-  final Uint8List? imgSplashBase64;
-  final Uint8List? logoSplashBase64;
+  const MyApp({Key? key}) : super(key: key);
 
   // This widget is the root of your application.
   @override
@@ -96,13 +65,7 @@ class MyApp extends StatelessWidget {
   }
 
   Widget renderHome() {
-    if (settings == null) {
-      return const InitialScreen();
-    } else {
-      return SplashScreen(
-          bytesImgSplashBase64: imgSplashBase64!,
-          byteslogoSplashBase64: logoSplashBase64!);
-    }
+    return const SplashScreen();
   }
 }
 

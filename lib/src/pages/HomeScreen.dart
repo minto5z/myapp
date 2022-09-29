@@ -1,40 +1,12 @@
-import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:myapp/src/elements/WebViewElement.dart';
-
-import '../elements/WebViewElementState.dart';
-import '../helpers/HexColor.dart';
-import '../helpers/SharedPref.dart';
-import '../models/setting.dart';
-import '../models/settings.dart';
-
-GlobalKey<WebViewElementState> key0 = GlobalKey();
-GlobalKey<WebViewElementState> key1 = GlobalKey();
-GlobalKey<WebViewElementState> key2 = GlobalKey();
-GlobalKey<WebViewElementState> key3 = GlobalKey();
-GlobalKey<WebViewElementState> key4 = GlobalKey();
-GlobalKey<WebViewElementState> keyMain = GlobalKey();
-GlobalKey<WebViewElementState> keyWebView = GlobalKey();
-List<GlobalKey<WebViewElementState>> listKey = [key0, key1, key2, key3, key4];
-
-StreamController<int> _controllerStream0 = StreamController<int>();
-StreamController<int> _controllerStream1 = StreamController<int>();
-StreamController<int> _controllerStream2 = StreamController<int>();
-StreamController<int> _controllerStream3 = StreamController<int>();
-StreamController<int> _controllerStream4 = StreamController<int>();
-List<StreamController<int>> listStream = [
-  _controllerStream0,
-  _controllerStream1,
-  _controllerStream2,
-  _controllerStream3,
-  _controllerStream4
-];
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:global_configuration/global_configuration.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomeScreen extends StatefulWidget {
-  final String url;
-
-  const HomeScreen(this.url, {super.key});
+  const HomeScreen({super.key});
 
   @override
   State<StatefulWidget> createState() {
@@ -43,223 +15,168 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreen extends State<HomeScreen> with TickerProviderStateMixin {
-  late TabController tabController;
-  int _currentIndex = 0;
-  static final GlobalKey<ScaffoldState> _scaffoldKey =
-      GlobalKey<ScaffoldState>();
   bool goToWeb = true;
-  var appLanguage;
   String url = "";
-  late String loader = "";
-  late String loaderColor="";
-  late String pullRefresh="";
+  final GlobalKey webViewKey = GlobalKey();
+  InAppWebViewController? webViewController;
+  InAppWebViewGroupOptions options = InAppWebViewGroupOptions(
+      crossPlatform: InAppWebViewOptions(
+        useShouldOverrideUrlLoading: true,
+        mediaPlaybackRequiresUserGesture: false,
+      ),
+      android: AndroidInAppWebViewOptions(
+        useHybridComposition: true,
+      ),
+      ios: IOSInAppWebViewOptions(
+        allowsInlineMediaPlayback: true,
+      ));
 
-  SharedPref sharedPref = SharedPref();
+  late PullToRefreshController pullToRefreshController;
+  double progress = 0;
+  final urlController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
-    tabController = TabController(initialIndex: 0, length: 1, vsync: this);
-    tabController.addListener(_handleTabSelection);
-    _handleIncomingLinks();
+    WidgetsFlutterBinding.ensureInitialized();
+    enableVirtual();
+    url = GlobalConfiguration().getValue('api_base_url');
+    pullToRefreshController = PullToRefreshController(
+      options: PullToRefreshOptions(
+        color: Colors.blue,
+      ),
+      onRefresh: () async {
+        if (Platform.isAndroid) {
+          webViewController?.reload();
+        } else if (Platform.isIOS) {
+          webViewController?.loadUrl(
+              urlRequest: URLRequest(url: await webViewController?.getUrl()));
+        }
+      },
+    );
   }
 
-  Future<void> _handleIncomingLinks() async {
-    url = await sharedPref.read("api_base_url");
-    loader = await sharedPref.read("loader");
-    loaderColor = await sharedPref.read("loaderColor");
-    pullRefresh = await sharedPref.read("pull_refresh");
+  enableVirtual() async {
+    if (Platform.isAndroid) {
+      await AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
+    }
   }
 
-  _handleTabSelection() {
-    setState(() {
-      _currentIndex = tabController.index;
-    });
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    MediaQueryData mediaQueryData = MediaQuery.of(context);
-    var bottomPadding = mediaQueryData.padding.bottom;
-    return WillPopScope(
-        onWillPop: () async {
-          getCurrentKey().currentState!.goBack();
-          return false;
-        },
-        child: Container(
-            decoration: BoxDecoration(color: HexColor("#f5f4f4")),
-            padding: EdgeInsets.only(bottom: bottomPadding),
-            child: Scaffold(
-              key: _scaffoldKey,
-              // appBar: AppBarHomeItem(
-              //     settings: widget.settings,
-              //     currentIndex: _currentIndex,
-              //     listKey: listKey,
-              //     scaffoldKey: _scaffoldKey),
-              // drawer: (widget.settings.leftNavigationIcon!.value ==
-              //             "icon_menu" ||
-              //         widget.settings.rightNavigationIcon!.value == "icon_menu")
-              //     ? SideMenuElement(settings: widget.settings, key0: key0)
-              //     : null,
-              body: Stack(fit: StackFit.expand, children: [
-                Column(children: [
-                    Expanded(
-                      child: WebViewElement(
-                          key: listKey[0],
-                          initialUrl: url,
-                          //renderLang("url", languageCode),
-                          loader: loader,
-                          loaderColor: loaderColor,
-                          pullRefresh: pullRefresh,
-                      ),
-                          // customCss: Setting.getValue(
-                          //     widget.settings.setting!, "customCss"),
-                          // customJavascript: Setting.getValue(
-                          //     widget.settings.setting!, "customJavascript"),
-                          // settings: widget.settings),
-                      // child: Setting.getValue(widget.settings.setting!,
-                      //             "tab_navigation_enable") ==
-                      //         "true"
-                      //     ? TabBarView(
-                      //         controller: tabController,
-                      //         physics: NeverScrollableScrollPhysics(),
-                      //         children: List.generate(widget.settings.tab!.length,
-                      //             (index) {
-                      //           return WebViewElement(
-                      //               key: listKey[index],
-                      //               initialUrl: renderTabUrl(index, languageCode),
-                      //               loader: Setting.getValue(
-                      //                   widget.settings.setting!, "loader"),
-                      //               loaderColor: Setting.getValue(
-                      //                   widget.settings.setting!, "loaderColor"),
-                      //               pullRefresh: Setting.getValue(
-                      //                   widget.settings.setting!, "pull_refresh"),
-                      //               userAgent: widget.settings.userAgent,
-                      //               customCss: Setting.getValue(
-                      //                   widget.settings.setting!, "customCss"),
-                      //               customJavascript: Setting.getValue(
-                      //                   widget.settings.setting!,
-                      //                   "customJavascript"),
-                      //               nativeApplication:
-                      //                   widget.settings.nativeApplication,
-                      //               settings: widget.settings);
-                      //         }),
-                      //       )
-                      //     : TabBarView(
-                      //         controller: tabController,
-                      //         physics: NeverScrollableScrollPhysics(),
-                      //         children: List.generate(1, (index) {
-                      //           return WebViewElement(
-                      //               key: listKey[0],
-                      //               initialUrl: renderLang("url", languageCode),
-                      //               loader: Setting.getValue(
-                      //                   widget.settings.setting!, "loader"),
-                      //               loaderColor: Setting.getValue(
-                      //                   widget.settings.setting!, "loaderColor"),
-                      //               pullRefresh: Setting.getValue(
-                      //                   widget.settings.setting!, "pull_refresh"),
-                      //               userAgent: widget.settings.userAgent,
-                      //               customCss: Setting.getValue(
-                      //                   widget.settings.setting!, "customCss"),
-                      //               customJavascript: Setting.getValue(
-                      //                   widget.settings.setting!,
-                      //                   "customJavascript"),
-                      //               nativeApplication:
-                      //                   widget.settings.nativeApplication,
-                      //               settings: widget.settings);
-                      //         }),
-                      //       ),
-                    )
-                ])
-              ]),
-              // bottomNavigationBar:
-              //     Setting.getValue(widget.settings.setting!, "tab_position") ==
-              //             "bottom"
-              //         ? TabNavigationMenu(
-              //             settings: widget.settings,
-              //             listStream: listStream,
-              //             tabController: tabController,
-              //             currentIndex: _currentIndex)
-              //         : null,
-              // floatingActionButton:
-              //     FloatingButton(settings: widget.settings, key0: key0),
-            )));
-  }
+    return Scaffold(
+        body: SafeArea(
+            child: Column(children: <Widget>[
+      Expanded(
+        child: Stack(
+          children: [
+            InAppWebView(
+              key: webViewKey,
+              initialUrlRequest: URLRequest(url: Uri.parse(url)),
+              initialOptions: options,
+              pullToRefreshController: pullToRefreshController,
+              onWebViewCreated: (controller) {
+                webViewController = controller;
+              },
+              onLoadStart: (controller, url) {
+                setState(() {
+                  this.url = url.toString();
+                  urlController.text = this.url;
+                });
+              },
+              androidOnPermissionRequest:
+                  (controller, origin, resources) async {
+                return PermissionRequestResponse(
+                    resources: resources,
+                    action: PermissionRequestResponseAction.GRANT);
+              },
+              shouldOverrideUrlLoading: (controller, navigationAction) async {
+                var uri = navigationAction.request.url!;
 
-  GlobalKey<WebViewElementState> getCurrentKey() {
-    switch (_currentIndex) {
-      case 0:
-        {
-          return key0;
-        }
-      case 1:
-        {
-          return key1;
-        }
+                if (![
+                  "http",
+                  "https",
+                  "file",
+                  "chrome",
+                  "data",
+                  "javascript",
+                  "about"
+                ].contains(uri.scheme)) {
+                  if (await canLaunch(url)) {
+                    // Launch the App
+                    await launch(
+                      url,
+                    );
+                    // and cancel the request
+                    return NavigationActionPolicy.CANCEL;
+                  }
+                }
 
-      case 2:
-        {
-          return key2;
-        }
-      case 3:
-        {
-          return key3;
-        }
-      case 4:
-        {
-          return key4;
-        }
-      default:
-        {
-          return key0;
-        }
-    }
-  }
-
-  GlobalKey<WebViewElementState> getKeyByIndex(index) {
-    switch (index) {
-      case 0:
-        {
-          return key0;
-        }
-
-      case 1:
-        {
-          return key1;
-        }
-
-      case 2:
-        {
-          return key2;
-        }
-      case 3:
-        {
-          return key3;
-        }
-      case 4:
-        {
-          return key4;
-        }
-      default:
-        {
-          return key0;
-        }
-    }
+                return NavigationActionPolicy.ALLOW;
+              },
+              onLoadStop: (controller, url) async {
+                pullToRefreshController.endRefreshing();
+                setState(() {
+                  this.url = url.toString();
+                  urlController.text = this.url;
+                });
+              },
+              onLoadError: (controller, url, code, message) {
+                pullToRefreshController.endRefreshing();
+              },
+              onProgressChanged: (controller, progress) {
+                if (progress == 100) {
+                  pullToRefreshController.endRefreshing();
+                }
+                setState(() {
+                  this.progress = progress / 100;
+                  urlController.text = url;
+                });
+              },
+              onUpdateVisitedHistory: (controller, url, androidIsReload) {
+                setState(() {
+                  this.url = url.toString();
+                  urlController.text = this.url;
+                });
+              },
+              onConsoleMessage: (controller, consoleMessage) {
+                print(consoleMessage);
+              },
+            ),
+            progress < 1.0
+                ? LinearProgressIndicator(value: progress)
+                : Container(),
+          ],
+        ),
+      ),
+      // ButtonBar(
+      //   alignment: MainAxisAlignment.center,
+      //   children: <Widget>[
+      //     ElevatedButton(
+      //       child: const Icon(Icons.arrow_back),
+      //       onPressed: () {
+      //         webViewController?.goBack();
+      //       },
+      //     ),
+      //     ElevatedButton(
+      //       child: const Icon(Icons.arrow_forward),
+      //       onPressed: () {
+      //         webViewController?.goForward();
+      //       },
+      //     ),
+      //     ElevatedButton(
+      //       child: const Icon(Icons.refresh),
+      //       onPressed: () {
+      //         webViewController?.reload();
+      //       },
+      //     ),
+      //   ],
+      // ),
+    ])));
   }
 }
-
-/*
-WebViewElement(
-                initialUrl: Setting.getValue(widget.settings.setting!, "url"),
-                loader: Setting.getValue(widget.settings.setting!, "loader"),
-                loaderColor:
-                    Setting.getValue(widget.settings.setting!, "loaderColor"),
-                pullRefresh:
-                    Setting.getValue(widget.settings.setting!, "pull_refresh"),
-                userAgent: widget.settings.userAgent,
-                customCss:
-                    Setting.getValue(widget.settings.setting!, "customCss"),
-                customJavascript: Setting.getValue(
-                    widget.settings.setting!, "customJavascript"),
-                nativeApplication: widget.settings.nativeApplication,
-              ),
- */
