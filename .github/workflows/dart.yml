@@ -23,6 +23,7 @@ jobs:
       #- run: flutter upgrade
       - run: flutter pub get
       - run: flutter pub run flutter_app_name
+      - run: flutter pub run flutter_launcher_icons:main
       #- run: flutter test
       - run: flutter build apk --target-platform=android-arm
       #- run: |
